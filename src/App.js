@@ -4,7 +4,10 @@ class Subject extends Component {
   render() {
     return (
       <header>
-        <h1>{this.props.title}</h1>
+        <h1><a href="/" onClick={function(ev) {
+          ev.preventDefault();
+          this.props.onClick();
+        }.bind(this)}>{this.props.title}</a></h1>
         {this.props.sub}
       </header>
     )
@@ -55,7 +58,9 @@ class Content extends Component {
 }
 
 class App extends Component {
+  
   state = {
+    mode: 'read',
     selected_content_id: 2,
     contents: [
       {id: 1, title: 'HTML', desc: 'HTML is for information'},
@@ -67,11 +72,25 @@ class App extends Component {
   getSelectedContent() {
     let i = 0;
     while(i < this.state.contents.length) {
-      const data = this.state.contents[i]
+      let data = this.state.contents[i]
       if(this.state.selected_content_id === data.id) {
         return data;
       }
       i = i + 1;
+    }
+  }
+
+  getContentComponent() {
+    if(this.state.mode === 'read') {
+      return <Content data={this.getSelectedContent()}></Content>
+    } else if (this.state.mode === 'welcome') {
+      return (
+      <Content data={{
+        title: 'Welcome',
+        desc: 'Hello, React!!!'
+      }}>        
+      </Content>
+    )  
     }
   }
 
@@ -80,14 +99,18 @@ class App extends Component {
     console.log(content);
   return (
     <div className="App">
-      <Subject title="WEB" sub="World wide web"></Subject>
-      <TOC onSelect={function(id) {
-        console.log('app', id);
+      <Subject onClick={function() {
         this.setState({
-          selected_content_id: id
+          mode: 'welcome'
+        })
+      }.bind(this)} title="WEB" sub="World wide web"></Subject>
+      <TOC onSelect={function(id) {
+        this.setState({
+          selected_content_id: id,
+          mode: 'read'
       })
       }.bind(this)}  data={this.state.contents}></TOC>
-      <Content data={this.getSelectedContent()}></Content>
+      {this.getContentComponent()}
     </div>
   )
 }
