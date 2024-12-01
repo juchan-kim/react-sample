@@ -20,12 +20,12 @@ class TOC extends Component {
     const list = [];
     let i = 0;
     while (i < this.props.data.length) {
-      const data = this.props.data[i];
+      let data = this.props.data[i];
       list.push(
       <li key={data.id}>
         <a href={data.id + '.html'} onClick={function(id, ev) {
           ev.preventDefault()
-          this.props.onSelect(id);
+          this.props.onSelected(id);
         }.bind(this, data.id)}>{data.title}          
         </a>
       </li>
@@ -61,7 +61,7 @@ class App extends Component {
   
   state = {
     mode: 'read',
-    selected_content_id: 2,
+    selected_content_id: 3,
     contents: [
       {id: 1, title: 'HTML', desc: 'HTML is for information'},
       {id: 2, title: 'CSS', desc: 'CSS is for style'},
@@ -94,6 +94,24 @@ class App extends Component {
     }
   }
 
+  getControlComponent() {
+    return [
+      <a key="1" href='/create'>create</a>,
+      <a key="2" href='/update'>update</a>,
+      <input key="3" type="button" href="/delete" onClick={function(){
+        var newContents = this.state.contents.filter(function(el){ 
+          if(el.id !== this.state.selected_content_id) {
+            return el;
+          }
+          }.bind(this));
+       this.setState({
+        contents: newContents,
+        mode: 'welcome'
+       });
+      }.bind(this)} value="delete"></input>,
+    ];
+  }
+  
   render() {
     let content = this.getSelectedContent();
     console.log(content);
@@ -104,12 +122,14 @@ class App extends Component {
           mode: 'welcome'
         })
       }.bind(this)} title="WEB" sub="World wide web"></Subject>
-      <TOC onSelect={function(id) {
+      <TOC onSelected={function(id) {
         this.setState({
           selected_content_id: id,
           mode: 'read'
       })
       }.bind(this)}  data={this.state.contents}></TOC>
+      
+      {this.getControlComponent()}
       {this.getContentComponent()}
     </div>
   )
