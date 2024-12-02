@@ -72,16 +72,21 @@ class ContentCreate extends Component {
   render() {
     return (
       <article>
-        <p><input type="text" placeholder='title' name="title" value={this.state.title} onChange={this.changeFormHandler.bind(this)}></input></p>
-        <p><textarea placeholder="description" name="desc" value={this.state.desc} onChange={this.changeFormHandler.bind(this)}></textarea></p>
-        <p><input type="submit"></input></p>
+        <form onSubmit={function(ev){
+          ev.preventDefault();
+          this.props.onSubmit(this.state);
+        }.bind(this)}>
+          <p><input type="text" placeholder='title' name="title" value={this.state.title} onChange={this.changeFormHandler.bind(this)}></input></p>
+          <p><textarea placeholder="description" name="desc" value={this.state.desc} onChange={this.changeFormHandler.bind(this)}></textarea></p>
+          <p><input type="submit"></input></p>
+        </form>
       </article>
     );
   }
 }
 
 class App extends Component {
-  
+  last_content_id = 3;
   state = {
     mode: 'read',
     selected_content_id: 3,
@@ -115,7 +120,18 @@ class App extends Component {
       </Content>
     )  
     } else if (this.state.mode === 'create') {
-      return <ContentCreate></ContentCreate>
+      return <ContentCreate onSubmit={function(formData){
+        console.log(formData);
+        this.last_content_id = this.last_content_id + 1;
+        formData.id = this.last_content_id;
+        let newContents = Object.assign([], this.state.contents);
+        newContents.push(formData);
+        this.setState({
+          contents: newContents,
+          selected_content_id: this.last_content_id,
+          mode:'read'
+        })
+      }.bind(this)}></ContentCreate>
     }
   }
 
