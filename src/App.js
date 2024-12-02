@@ -57,6 +57,29 @@ class Content extends Component {
   }
 }
 
+class ContentCreate extends Component {
+  state = {
+    title: '',
+    desc: ''
+  }
+
+  changeFormHandler(ev){
+    this.setState({
+      [ev.target.name]: ev.target.value
+    })
+  }
+
+  render() {
+    return (
+      <article>
+        <p><input type="text" placeholder='title' name="title" value={this.state.title} onChange={this.changeFormHandler.bind(this)}></input></p>
+        <p><textarea placeholder="description" name="desc" value={this.state.desc} onChange={this.changeFormHandler.bind(this)}></textarea></p>
+        <p><input type="submit"></input></p>
+      </article>
+    );
+  }
+}
+
 class App extends Component {
   
   state = {
@@ -91,13 +114,23 @@ class App extends Component {
       }}>        
       </Content>
     )  
+    } else if (this.state.mode === 'create') {
+      return <ContentCreate></ContentCreate>
     }
   }
 
   getControlComponent() {
     return [
-      <a key="1" href='/create'>create</a>,
-      <a key="2" href='/update'>update</a>,
+      <a key="1" href='/create' onClick={function(ev) {
+        ev.preventDefault();
+        this.setState({
+          mode: 'create'
+        })
+      }.bind(this)}>create</a>,
+      <a key="2" href='/update' onClick={function(ev) {
+        ev.preventDefault();
+        
+      }.bind(this)}>update</a>,
       <input key="3" type="button" href="/delete" onClick={function(){
         var newContents = this.state.contents.filter(function(el){ 
           if(el.id !== this.state.selected_content_id) {
